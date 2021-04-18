@@ -1,0 +1,202 @@
+﻿
+@{
+    ViewBag.Title = "Agriculture API";
+}
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Agriculture</h2>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="CropName">
+                            CropName <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="CropName" required="required" class="form-control col-md-7 col-xs-12" name="CropName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="CropPrice">
+                            CropPrice <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="CropPrice" required="required" class="form-control col-md-7 col-xs-12" name="CropPrice">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="CropSeed">
+                            Mobile <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input type="text" id="CropSeed" required="required" class="form-control col-md-7 col-xs-12" name="CropSeed">
+                        </div>
+                    </div>
+                    
+
+                    <div class="ln_solid"></div>
+                    <input type="hidden" id="ID" name="ID" />
+                    <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                            <button type="submit" class="btn btn-primary" id="btn1">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="x_panel">
+        <div class="x_title">
+            <h2>Agriculture List</h2>
+
+            <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+            <div class="table-responsive">
+                <table class="table table-bordered jambo_table bulk_action" id="tab1">
+                    <tr class="headings">
+                        <th class="column-title" width="180px"># </th>
+                        <th class="column-title" width="380px">Crop Name </th>
+                        <th class="column-title" width="380px">Crop Price </th>
+                        <th class="column-title" width="380px">Crop Seed </th>
+
+
+                        <th class="column-title no-link last" width="240px">
+                            <span class="nobr">Action</span>
+                        </th>
+                    </tr>
+
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    function AddEditRecord(id, cropName, cropPrice, cropSeed) {
+        $("#CropName").val(cropName);
+        $("#CropPrice").val(cropPrice);
+        $("#CropSeed").val(cropSeed);
+        $("#ID").val(id);
+    }
+
+
+
+    function UpdateRecord() {
+        //debugger;
+        $.ajax({
+            type: "Put",
+            url: "/api/Agricultures/" + $("#ID").val(),
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify({
+                CropName: $("#CropName").val(),
+                CropPrice: $("#CropPrice").val(),
+                CropSeed: $("#CropSeed").val()
+            }),
+
+            dataType: "JSON",
+
+            success: function (data) {
+                $("#tab1").find("tr:gt(0)").remove();
+                $.getJSON("/api/Agricultures/", function (data) {
+                    $("#tab1").css("display", "block");
+                    $.each(data, function (key, val) {
+                        $("<tr class='even pointer'><td width='180px'>" + val.id + "</td><td width='180px'>" + val.cropName + "</td><td width='180px'>" + val.cropPrice + "</td><td width='180px'>" + val.cropSeed + "</td><td width='240px'>" + "<button class='btn btn-primary btn-xs' onclick='AddEditRecord(" + val.id + ',"' + val.cropName + '","' + val.cropPrice + '","' + val.cropSeed + '"' + ");'" + ">Edit</button> <button class='btn btn-danger btn-xs' onclick='DeleteRecord(" + val.id + ");'" + ">Delete</button>" + "</td></tr>").appendTo($("#tab1"));
+                    })
+                })
+                window.location.href("/Agricuture/Index");
+            }
+        });
+    }
+    //Delete
+    function DeleteRecord(ID) {
+        $.ajax({
+
+            type: "DELETE",
+
+            contentType: "application/json;charset=utf-8",
+
+            url: "/api/Agricultures/" + ID,
+
+            data: JSON.stringify({
+                id: ID,
+            }),
+            dataType: "JSON",
+            success: function (data) {
+                $("#tab1").find("tr:gt(0)").remove();
+                $.getJSON("/api/Agricultures/", function (data) {
+                    $("#tab1").css("display", "block");
+                    $.each(data, function (key, val) {
+                        $("<tr class='even pointer'><td width='180px'>" + val.id + "</td><td width='180px'>" + val.cropName + "</td><td width='180px'>" + val.cropPrice + "</td><td width='180px'>" + val.cropSeed + "</td><td width='240px'>" + "<button class='btn btn-primary btn-xs' onclick='AddEditRecord(" + val.id + ',"' + val.cropName + '","' + val.cropPrice + '","' + val.cropSeed + '"' + ");'" + ">Edit</button> <button class='btn btn-danger btn-xs' onclick='DeleteRecord(" + val.id + ");'" + ">Delete</button>" + "</td></tr>").appendTo($("#tab1"));
+
+                    })
+
+                })
+            }
+        });
+    }
+    $(document).ready(function () {
+        debugger;
+        $("#tab1").css("display", "none");
+        $.getJSON("/api/Agricultures/", function (data) {
+            $("#tab1").css("display", "block");
+            $.each(data, function (key, val) {
+                $("<tr class='even pointer'><td width='180px'>" + val.id + "</td><td width='180px'>" + val.cropName + "</td><td width='180px'>" + val.cropPrice + "</td><td width='180px'>" + val.cropSeed + "</td><td width='240px'>" + "<button class='btn btn-primary btn-xs' onclick='AddEditRecord(" + val.id + ',"' + val.cropName + '","' + val.cropPrice + '","' + val.cropSeed + '"' + ");'" + ">Edit</button> <button class='btn btn-danger btn-xs' onclick='DeleteRecord(" + val.id + ");'" + ">Delete</button>" + "</td></tr>").appendTo($("#tab1"));
+
+            });
+        })
+
+        //POST
+        $("#btn1").click(function () {
+            if ($("#ID").val() > 0) {
+                UpdateRecord();
+            }
+            else {
+                var cropName = $("#CropName").val();
+                var cropPrice = $("#CropPrice").val();
+                var cropSeed = $("#CropSeed").val();
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    url: "/api/Agricultures/",
+                    data: JSON.stringify({
+                        CropName: cropName, CropPrice: cropPrice, CropSeed: cropSeed
+
+                    }),
+                    dataType: "JSON",
+                    success: function (data) {
+                        $("#ID").val('');
+                        $("#tab1").find("tr:gt(0)").remove();
+                        $.getJSON("/api/Agricultures/", function (data) {
+                            $("#tab1").css("display", "block");
+                            $.each(data, function (key, val) {
+                                $("<tr class='even pointer'><td width='180px'>" + val.id + "</td><td width='180px'>" + val.cropName + "</td><td width='180px'>" + val.cropPrice + "</td><td width='180px'>" + val.cropSeed + "</td><td width='240px'>" + "<button class='btn btn-primary btn-xs' onclick='AddEditRecord(" + val.id + ',"' + val.cropName + '","' + val.cropPrice + '","' + val.cropSeed + '"' + ");'" + ">Edit</button> <button class='btn btn-danger btn-xs' onclick='DeleteRecord(" + val.id + ");'" + ">Delete</button>" + "</td></tr>").appendTo($("#tab1"));
+
+                            })
+
+                        })
+
+
+
+                    }
+                });
+            }
+
+        })
+    });
+
+</script>
+
+
+
